@@ -1,46 +1,26 @@
-import java.util.concurrent.atomic.AtomicReference
-
-data class Node(val value: Int?, var next: Node?)
-
-val H = AtomicReference<Node>(Node(null, null))
-
-fun pop(): Int? {
-    while (true) { // Cas loop
-        val oldHead = H.get()
-        val newHead = oldHead.next
-        if (H.compareAndSet(oldHead, newHead)) {
-            return oldHead.value
-        }
+import stack.treiberStackWithElimination.TreiberStackWithElimination
+import java.lang.Thread.sleep
+fun println (stack: TreiberStackWithElimination<Int>) {
+    while (stack.top() != null) {
+        print("${stack.top()} ")
+        stack.pop()
     }
 }
+fun main() {
+    val stack = TreiberStackWithElimination<Int>()
 
-fun push(x: Int) {
-    while (true) { // Cas loop
-        val oldHead = H.get()
-        val newHead = Node(x, oldHead)
-        if (H.compareAndSet(oldHead, newHead)) {
-            return
-        }
-    }
-}
+    Thread {
+        stack.push(1)
+    }.start()
 
-fun top(): Int? {
-    while (true) { // Cas loop
-        val head = H.get()
-        if (head.value == null) {
-            return null
-        } else {
-            return head.value
-        }
-    }
-}
+    Thread {
+        stack.push(2)
+    }.start()
 
+    Thread {
+        stack.push(3)
+    }.start()
 
-fun main(args: Array<String>) {
-    push(2)
-    push(3)
-    push(4)
-    println(top())
-    pop()
-    println(top())
+    sleep(5000)
+    println(stack)
 }
