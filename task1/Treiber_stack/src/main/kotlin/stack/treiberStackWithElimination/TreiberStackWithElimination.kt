@@ -5,7 +5,7 @@ import stack.Stack
 import kotlinx.atomicfu.atomicArrayOfNulls
 import java.util.concurrent.atomic.AtomicReference
 
-private const val SIZE = 10
+private const val SIZE = 2
 
 class TreiberStackWithElimination<T : Any>: Stack<T> {
 

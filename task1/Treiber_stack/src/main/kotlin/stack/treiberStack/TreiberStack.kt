@@ -11,8 +11,8 @@ class TreiberStack<T>: Stack<T> {
     override fun pop(): T? {
         while (true) { // Cas loop
             val head = H.get()
-            if (H.compareAndSet(head, head.next))
-                return head.value
+            if (H.compareAndSet(head, head?.next))
+                return head?.value
         }
     }
 
