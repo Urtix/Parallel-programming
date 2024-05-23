@@ -56,11 +56,11 @@ open class ThinBST<T : Comparable<T>> {
         Mutex().lock()
         if (root != null) {
             root?.lock()
-            root = delete(root, value)
+            root = thinDelete(root, value)
         }
     }
 
-    private suspend fun delete(node: NodeMutex<T>?, value: T): NodeMutex<T>? {
+     protected suspend fun thinDelete(node: NodeMutex<T>?, value: T): NodeMutex<T>? {
         if (node == null) {
             return null
         }
@@ -83,7 +83,7 @@ open class ThinBST<T : Comparable<T>> {
                         }
                         node.value = successor!!.value
                         node.unlock()
-                        node.right = delete(node.right, successor.value)
+                        node.right = thinDelete(node.right, successor.value)
                         return node
                     }
                 }
@@ -95,7 +95,7 @@ open class ThinBST<T : Comparable<T>> {
                 } else {
                     node.left?.lock()
                     node.unlock()
-                    node.left = delete(node.left, value)
+                    node.left = thinDelete(node.left, value)
                     node
                 }
             }
@@ -106,7 +106,7 @@ open class ThinBST<T : Comparable<T>> {
                 } else {
                     node.right?.lock()
                     node.unlock()
-                    node.right = delete(node.right, value)
+                    node.right = thinDelete(node.right, value)
                     node
                 }
             }
@@ -156,7 +156,7 @@ open class ThinBST<T : Comparable<T>> {
     }
 
     // Печать дерева
-    fun printTree() {
+    open fun printTree() {
         printTree(root)
     }
 
