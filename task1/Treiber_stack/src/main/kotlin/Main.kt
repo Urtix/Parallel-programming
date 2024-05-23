@@ -3,14 +3,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import stack.treiberStack.TreiberStack
 import stack.treiberStackWithElimination.TreiberStackWithElimination
-import java.lang.Thread.sleep
-import kotlin.coroutines.coroutineContext
+import java.io.File
+import kotlin.random.Random
 import kotlin.system.measureNanoTime
 
 fun main() = runBlocking {
+
     val stack = TreiberStack<Int>()
     var srTS = 0L
     var srTSWE = 0L
+    var res = 0f
     repeat(100) {
         srTS += testTS()
     }
@@ -20,7 +22,13 @@ fun main() = runBlocking {
         srTSWE += testTSWE()
     }
     srTSWE /= 100
-    println(srTS - srTSWE)
+
+    res = srTS.toFloat() / srTSWE.toFloat()
+    println(res)
+
+    val file = File("random.txt")
+    file.appendText("\n$res")
+
 
 }
 
@@ -30,13 +38,20 @@ suspend fun testTS (): Long = coroutineScope{
     val time = measureNanoTime {
         launch {
             for (i in 0..10_000) {
-                stack.push((0..100).random())
+                if (Random.nextBoolean()) {
+                    stack.push(i) // Срабатывает операция push
+                } else {
+                    stack.pop() // Срабатывает операция pop
+                }
             }
         }
-
         launch {
-            for (i in 0 until 10_000) {
-                stack.pop()
+            for (i in 0..10_000) {
+                if (Random.nextBoolean()) {
+                    stack.push(i) // Срабатывает операция push
+                } else {
+                    stack.pop() // Срабатывает операция pop
+                }
             }
         }
     }
@@ -50,13 +65,20 @@ suspend fun testTSWE (): Long = coroutineScope {
     val time = measureNanoTime {
         launch {
             for (i in 0..10_000) {
-                stack.push((0..100).random())
+                if (Random.nextBoolean()) {
+                    stack.push(i) // Срабатывает операция push
+                } else {
+                    stack.pop() // Срабатывает операция pop
+                }
             }
         }
-
         launch {
-            for (i in 0 until 10_000) {
-                stack.pop()
+            for (i in 0..10_000) {
+                if (Random.nextBoolean()) {
+                    stack.push(i) // Срабатывает операция push
+                } else {
+                    stack.pop() // Срабатывает операция pop
+                }
             }
         }
     }
