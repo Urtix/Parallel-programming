@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class TestsTreiberStack</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class TestsTreiberStack</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/default-package.html">default-package</a> &gt; TestsTreiberStack</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">2</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">2</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">5.000s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox failures" id="successRate">
+<div class="percent">0%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Failed tests</a>
+</li>
+<li>
+<a href="#tab1">Tests</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Failed tests</h2>
+<div class="test">
+<a name="modelCheckingTest()"></a>
+<h3 class="failures">modelCheckingTest()</h3>
+<span class="code">
+<pre>org.jetbrains.kotlinx.lincheck.LincheckAssertionError: 
+= Invalid execution results =
+| --------------------------------------------------- |
+|       Thread 1        |          Thread 2           |
+| --------------------------------------------------- |
+| pop(1) + cancel: void | top(1): SUSPENDED + 1 [1,0] |
+| top(1): 1 [1,0]       |                             |
+| --------------------------------------------------- |
+
+---
+Values in &quot;[..]&quot; brackets indicate the number of completed operations
+in each of the parallel threads seen at the beginning of the current operation
+---
+
+The following interleaving leads to the error:
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+|                                   Thread 1                                    |                                                        Thread 2                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| pop(1) + cancel                                                               |                                                                                                                        |
+| top(1): 1                                                                     |                                                                                                                        |
+|   search(1): 1 at TestsTreiberStack.top(TestsThinBST.kt:18)                   |                                                                                                                        |
+|     search$suspendImpl(ThinBST@1,1,&lt;cont&gt;): 1 at ThinBST.search(ThinBST.kt:0) |                                                                                                                        |
+|       root.READ: NodeMutex@1 at ThinBST.search$suspendImpl(ThinBST.kt:118)    |                                                                                                                        |
+|       root.READ: NodeMutex@1 at ThinBST.search$suspendImpl(ThinBST.kt:120)    |                                                                                                                        |
+|       lock(): Unit@1 at ThinBST.search$suspendImpl(ThinBST.kt:120)            |                                                                                                                        |
+|       switch                                                                  |                                                                                                                        |
+|                                                                               | top(1): SUSPENDED + 1                                                                                                  |
+|                                                                               |   search(1): CoroutineSingletons@1 at TestsTreiberStack.top(TestsThinBST.kt:18)                                        |
+|                                                                               |     search$suspendImpl(ThinBST@1,1,&lt;cont&gt;): CoroutineSingletons@1 at ThinBST.search(ThinBST.kt:0)                      |
+|                                                                               |       root.READ: NodeMutex@1 at ThinBST.search$suspendImpl(ThinBST.kt:118)                                             |
+|                                                                               |       root.READ: NodeMutex@1 at ThinBST.search$suspendImpl(ThinBST.kt:120)                                             |
+|                                                                               |       lock(): CoroutineSingletons@1 at ThinBST.search$suspendImpl(ThinBST.kt:120)                                      |
+|                                                                               |         lock$default(MutexImpl@1,null,&lt;cont&gt;,1,null): CoroutineSingletons@1 at NodeMutex.lock(NodeMutex.kt:8)          |
+|                                                                               |           lock(null): CoroutineSingletons@1 at Mutex$DefaultImpls.lock$default(Mutex.kt:68)                            |
+|                                                                               |             lock$suspendImpl(MutexImpl@1,null,&lt;cont&gt;): CoroutineSingletons@1 at MutexImpl.lock(Mutex.kt:0)             |
+|                                                                               |               tryLock(null): false at MutexImpl.lock$suspendImpl(Mutex.kt:171)                                         |
+|                                                                               |               lockSuspend(null): CoroutineSingletons@1 at MutexImpl.lock$suspendImpl(Mutex.kt:172)                     |
+|                                                                               |                 acquire(&lt;cont&gt;) at MutexImpl.lockSuspend(Mutex.kt:177)                                                 |
+|                                                                               |                 getResult(): CoroutineSingletons@1 at MutexImpl.lockSuspend(Mutex.kt:321)                              |
+|                                                                               |                   isReusable(): false at CancellableContinuationImpl.getResult(CancellableContinuationImpl.kt:297)     |
+|                                                                               |                   trySuspend(): true at CancellableContinuationImpl.getResult(CancellableContinuationImpl.kt:300)      |
+|                                                                               |                   getParentHandle(): null at CancellableContinuationImpl.getResult(CancellableContinuationImpl.kt:310) |
+|                                                                               |   switch (reason: coroutine is suspended)                                                                              |
+|       root.READ: NodeMutex@1 at ThinBST.search$suspendImpl(ThinBST.kt:121)    |                                                                                                                        |
+|       search(NodeMutex@1,1): 1 at ThinBST.search$suspendImpl(ThinBST.kt:121)  |                                                                                                                        |
+|   result: 1                                                                   |                                                                                                                        |
+|                                                                               |   root.READ: NodeMutex@1 at ThinBST.search$suspendImpl(ThinBST.kt:121)                                                 |
+|                                                                               |   result: SUSPENDED + 1                                                                                                |
+|                                                                               |             value.READ: 1 at NodeMutex.getValue(NodeMutex.kt:3)                                                        |
+|                                                                               |                 unlock$default(MutexImpl@1,null,1,null) at NodeMutex.unlock(NodeMutex.kt:9)                            |
+|                                                                               |       getValue(): 1 at ThinBST.search(ThinBST.kt:132)                                                                  |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+
+Detailed trace:
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|                                                                                             Thread 1                                                                                             |                                                                                   Thread 2                                                                                    |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| pop(1) + cancel                                                                                                                                                                                  |                                                                                                                                                                               |
+|   add(1): Unit@1 at TestsTreiberStack.pop(TestsThinBST.kt:12)                                                                                                                                    |                                                                                                                                                                               |
+|     add$suspendImpl(ThinBST@1,1,&lt;cont&gt;): Unit@1 at ThinBST.add(ThinBST.kt:0)                                                                                                                     |                                                                                                                                                                               |
+|       Mutex$default(false,1,null): MutexImpl@2 at ThinBST.add$suspendImpl(ThinBST.kt:8)                                                                                                          |                                                                                                                                                                               |
+|         Mutex(false): MutexImpl@2 at MutexKt.Mutex$default(Mutex.kt:108)                                                                                                                         |                                                                                                                                                                               |
+|           &lt;init&gt;(false) at MutexKt.Mutex(Mutex.kt:109)                                                                                                                                           |                                                                                                                                                                               |
+|             &lt;init&gt;(1,0) at MutexImpl.&lt;init&gt;(Mutex.kt:134)                                                                                                                                        |                                                                                                                                                                               |
+|               &lt;init&gt;(0,null,2) at SemaphoreImpl.&lt;init&gt;(Semaphore.kt:139)                                                                                                                         |                                                                                                                                                                               |
+|                 &lt;init&gt;(16) at SemaphoreSegment.&lt;init&gt;(Semaphore.kt:363)                                                                                                                          |                                                                                                                                                                               |
+|             owner.WRITE(&lt;NO_OWNER&gt;) at MutexImpl.&lt;init&gt;(Mutex.kt:141)                                                                                                                            |                                                                                                                                                                               |
+|       lock$default(MutexImpl@2,null,&lt;cont&gt;,1,null): Unit@1 at ThinBST.add$suspendImpl(ThinBST.kt:8)                                                                                              |                                                                                                                                                                               |
+|         lock(null): Unit@1 at Mutex$DefaultImpls.lock$default(Mutex.kt:68)                                                                                                                       |                                                                                                                                                                               |
+|           lock$suspendImpl(MutexImpl@2,null,&lt;cont&gt;): Unit@1 at MutexImpl.lock(Mutex.kt:0)                                                                                                        |                                                                                                                                                                               |
+|             tryLock(null): true at MutexImpl.lock$suspendImpl(Mutex.kt:171)                                                                                                                      |                                                                                                                                                                               |
+|               tryLockImpl(null): 0 at MutexImpl.tryLock(Mutex.kt:183)                                                                                                                            |                                                                                                                                                                               |
+|                 tryAcquire(): true at MutexImpl.tryLockImpl(Mutex.kt:189)                                                                                                                        |                                                                                                                                                                               |
+|                   _availablePermits.get(): 1 at SemaphoreImpl.tryAcquire(Semaphore.kt:159)                                                                                                       |                                                                                                                                                                               |
+|                   _availablePermits.compareAndSet(1,0): true at SemaphoreImpl.tryAcquire(Semaphore.kt:171)                                                                                       |                                                                                                                                                                               |
+|                 owner.get(): &lt;NO_OWNER&gt; at MutexImpl.tryLockImpl(Mutex.kt:190)                                                                                                                   |                                                                                                                                                                               |
+|                 owner.set(null) at MutexImpl.tryLockImpl(Mutex.kt:191)                                                                                                                           |                                                                                                                                                                               |
+|       root.READ: null at ThinBST.add$suspendImpl(ThinBST.kt:9)                                                                                                                                   |                                                                                                                                                                               |
+|       &lt;init&gt;(1,null) at ThinBST.add$suspendImpl(ThinBST.kt:13)                                                                                                                                   |                                                                                                                                                                               |
+|         Mutex$default(false,1,null): MutexImpl@1 at NodeMutex.&lt;init&gt;(NodeMutex.kt:7)                                                                                                             |                                                                                                                                                                               |
+|           Mutex(false): MutexImpl@1 at MutexKt.Mutex$default(Mutex.kt:108)                                                                                                                       |                                                                                                                                                                               |
+|             &lt;init&gt;(false) at MutexKt.Mutex(Mutex.kt:109)                                                                                                                                         |                                                                                                                                                                               |
+|               &lt;init&gt;(1,0) at MutexImpl.&lt;init&gt;(Mutex.kt:134)                                                                                                                                      |                                                                                                                                                                               |
+|                 &lt;init&gt;(0,null,2) at SemaphoreImpl.&lt;init&gt;(Semaphore.kt:139)                                                                                                                       |                                                                                                                                                                               |
+|                   &lt;init&gt;(16) at SemaphoreSegment.&lt;init&gt;(Semaphore.kt:363)                                                                                                                        |                                                                                                                                                                               |
+|               owner.WRITE(&lt;NO_OWNER&gt;) at MutexImpl.&lt;init&gt;(Mutex.kt:141)                                                                                                                          |                                                                                                                                                                               |
+|       root.WRITE(NodeMutex@1) at ThinBST.add$suspendImpl(ThinBST.kt:9)                                                                                                                           |                                                                                                                                                                               |
+|   result: void                                                                                                                                                                                   |                                                                                                                                                                               |
+| top(1): 1                                                                                                                                                                                        |                                                                                                                                                                               |
+|   search(1): 1 at TestsTreiberStack.top(TestsThinBST.kt:18)                                                                                                                                      |                                                                                                                                                                               |
+|     search$suspendImpl(ThinBST@1,1,&lt;cont&gt;): 1 at ThinBST.search(ThinBST.kt:0)                                                                                                                    |                                                                                                                                                                               |
+|       root.READ: NodeMutex@1 at ThinBST.search$suspendImpl(ThinBST.kt:118)                                                                                                                       |                                                                                                                                                                               |
+|       root.READ: NodeMutex@1 at ThinBST.search$suspendImpl(ThinBST.kt:120)                                                                                                                       |                                                                                                                                                                               |
+|       lock(): Unit@1 at ThinBST.search$suspendImpl(ThinBST.kt:120)                                                                                                                               |                                                                                                                                                                               |
+|         lock$default(MutexImpl@1,null,&lt;cont&gt;,1,null): Unit@1 at NodeMutex.lock(NodeMutex.kt:8)                                                                                                   |                                                                                                                                                                               |
+|           lock(null): Unit@1 at Mutex$DefaultImpls.lock$default(Mutex.kt:68)                                                                                                                     |                                                                                                                                                                               |
+|             lock$suspendImpl(MutexImpl@1,null,&lt;cont&gt;): Unit@1 at MutexImpl.lock(Mutex.kt:0)                                                                                                      |                                                                                                                                                                               |
+|               tryLock(null): true at MutexImpl.lock$suspendImpl(Mutex.kt:171)                                                                                                                    |                                                                                                                                                                               |
+|                 tryLockImpl(null): 0 at MutexImpl.tryLock(Mutex.kt:183)                                                                                                                          |                                                                                                                                                                               |
+|                   tryAcquire(): true at MutexImpl.tryLockImpl(Mutex.kt:189)                                                                                                                      |                                                                                                                                                                               |
+|                     _availablePermits.get(): 1 at SemaphoreImpl.tryAcquire(Semaphore.kt:159)                                                                                                     |                                                                                                                                                                               |
+|                     _availablePermits.compareAndSet(1,0): true at SemaphoreImpl.tryAcquire(Semaphore.kt:171)                                                                                     |                                                                                                                                                                               |
+|                   owner.get(): &lt;NO_OWNER&gt; at MutexImpl.tryLockImpl(Mutex.kt:190)                                                                                                                 |                                                                                                                                                                               |
+|                   owner.set(null) at MutexImpl.tryLockImpl(Mutex.kt:191)                                                                                                                         |                                                                                                                                                                               |
+|       switch                                                                                                                                                                                     |                                                                                                                                                                               |
+|                                                                                                                                                                                                  | top(1): SUSPENDED + 1                                                                                                                                                         |
+|                                                                                                                                                                                                  |   search(1): CoroutineSingletons@1 at TestsTreiberStack.top(TestsThinBST.kt:18)                                                                                               |
+|                                                                                                                                                                                                  |     search$suspendImpl(ThinBST@1,1,&lt;cont&gt;): CoroutineSingletons@1 at ThinBST.search(ThinBST.kt:0)                                                                             |
+|                                                                                                                                                                                                  |       root.READ: NodeMutex@1 at ThinBST.search$suspendImpl(ThinBST.kt:118)                                                                                                    |
+|                                                                                                                                                                                                  |       root.READ: NodeMutex@1 at ThinBST.search$suspendImpl(ThinBST.kt:120)                                                                                                    |
+|                                                                                                                                                                                                  |       lock(): CoroutineSingletons@1 at ThinBST.search$suspendImpl(ThinBST.kt:120)                                                                                             |
+|                                                                                                                                                                                                  |         lock$default(MutexImpl@1,null,&lt;cont&gt;,1,null): CoroutineSingletons@1 at NodeMutex.lock(NodeMutex.kt:8)                                                                 |
+|                                                                                                                                                                                                  |           lock(null): CoroutineSingletons@1 at Mutex$DefaultImpls.lock$default(Mutex.kt:68)                                                                                   |
+|                                                                                                                                                                                                  |             lock$suspendImpl(MutexImpl@1,null,&lt;cont&gt;): CoroutineSingletons@1 at MutexImpl.lock(Mutex.kt:0)                                                                    |
+|                                                                                                                                                                                                  |               tryLock(null): false at MutexImpl.lock$suspendImpl(Mutex.kt:171)                                                                                                |
+|                                                                                                                                                                                                  |                 tryLockImpl(null): 1 at MutexImpl.tryLock(Mutex.kt:183)                                                                                                       |
+|                                                                                                                                                                                                  |                   tryAcquire(): false at MutexImpl.tryLockImpl(Mutex.kt:189)                                                                                                  |
+|                                                                                                                                                                                                  |                     _availablePermits.get(): 0 at SemaphoreImpl.tryAcquire(Semaphore.kt:159)                                                                                  |
+|                                                                                                                                                                                                  |               lockSuspend(null): CoroutineSingletons@1 at MutexImpl.lock$suspendImpl(Mutex.kt:172)                                                                            |
+|                                                                                                                                                                                                  |                 acquire(&lt;cont&gt;) at MutexImpl.lockSuspend(Mutex.kt:177)                                                                                                        |
+|                                                                                                                                                                                                  |                   decPermits(): 0 at SemaphoreImpl.acquire(Semaphore.kt:413)                                                                                                  |
+|                                                                                                                                                                                                  |                     _availablePermits.getAndDecrement(): 0 at SemaphoreImpl.decPermits(Semaphore.kt:237)                                                                      |
+|                                                                                                                                                                                                  |                   addAcquireToQueue(&lt;cont&gt;): true at SemaphoreImpl.acquire(Semaphore.kt:199)                                                                                  |
+|                                                                                                                                                                                                  |                     tail.get(): SemaphoreSegment@1 at SemaphoreImpl.addAcquireToQueue(Semaphore.kt:286)                                                                       |
+|                                                                                                                                                                                                  |                     enqIdx.getAndIncrement(): 0 at SemaphoreImpl.addAcquireToQueue(Semaphore.kt:287)                                                                          |
+|                                                                                                                                                                                                  |                     findSegmentInternal(SemaphoreSegment@1,0,createNewSegment$1): SemaphoreSegment@1 at SemaphoreImpl.addAcquireToQueue(Semaphore.kt:432)                     |
+|                                                                                                                                                                                                  |                       isRemoved(): false at ConcurrentLinkedListKt.findSegmentInternal(ConcurrentLinkedList.kt:26)                                                            |
+|                                                                                                                                                                                                  |                         cleanedAndPointers.get(): 131072 at Segment.isRemoved(ConcurrentLinkedList.kt:222)                                                                    |
+|                                                                                                                                                                                                  |                     tail.get(): SemaphoreSegment@1 at SemaphoreImpl.addAcquireToQueue(Semaphore.kt:433)                                                                       |
+|                                                                                                                                                                                                  |                     compareAndSet(0,null,&lt;cont&gt;): true at SemaphoreImpl.addAcquireToQueue(Semaphore.kt:442)                                                                   |
+|                                                                                                                                                                                                  |                     invokeOnCancellation(SemaphoreSegment@1,0) at SemaphoreImpl.addAcquireToQueue(Semaphore.kt:294)                                                           |
+|                                                                                                                                                                                                  |                       invokeOnCancellation(SemaphoreSegment@1,0) at MutexImpl$CancellableContinuationWithOwner.invokeOnCancellation(Mutex.kt:0)                               |
+|                                                                                                                                                                                                  |                         _decisionAndIndex.get(): 536870911 at CancellableContinuationImpl.invokeOnCancellation(CancellableContinuationImpl.kt:0)                              |
+|                                                                                                                                                                                                  |                         _decisionAndIndex.compareAndSet(536870911,0): true at CancellableContinuationImpl.invokeOnCancellation(CancellableContinuationImpl.kt:392)            |
+|                                                                                                                                                                                                  |                         invokeOnCancellationImpl(SemaphoreSegment@1) at CancellableContinuationImpl.invokeOnCancellation(CancellableContinuationImpl.kt:394)                  |
+|                                                                                                                                                                                                  |                           _state.get(): Active@1 at CancellableContinuationImpl.invokeOnCancellationImpl(CancellableContinuationImpl.kt:403)                                  |
+|                                                                                                                                                                                                  |                           _state.compareAndSet(Active@1,SemaphoreSegment@1): true at CancellableContinuationImpl.invokeOnCancellationImpl(CancellableContinuationImpl.kt:407) |
+|                                                                                                                                                                                                  |                 getResult(): CoroutineSingletons@1 at MutexImpl.lockSuspend(Mutex.kt:321)                                                                                     |
+|                                                                                                                                                                                                  |                   isReusable(): false at CancellableContinuationImpl.getResult(CancellableContinuationImpl.kt:297)                                                            |
+|                                                                                                                                                                                                  |                     resumeMode.READ: 1 at CancellableContinuationImpl.isReusable(CancellableContinuationImpl.kt:141)                                                          |
+|                                                                                                                                                                                                  |                   trySuspend(): true at CancellableContinuationImpl.getResult(CancellableContinuationImpl.kt:300)                                                             |
+|                                                                                                                                                                                                  |                     _decisionAndIndex.get(): 0 at CancellableContinuationImpl.trySuspend(CancellableContinuationImpl.kt:0)                                                    |
+|                                                                                                                                                                                                  |                     _decisionAndIndex.compareAndSet(0,536870912): true at CancellableContinuationImpl.trySuspend(CancellableContinuationImpl.kt:278)                          |
+|                                                                                                                                                                                                  |                   getParentHandle(): null at CancellableContinuationImpl.getResult(CancellableContinuationImpl.kt:310)                                                        |
+|                                                                                                                                                                                                  |                     _parentHandle.get(): null at CancellableContinuationImpl.getParentHandle(CancellableContinuationImpl.kt:106)                                              |
+|                                                                                                                                                                                                  |   switch (reason: coroutine is suspended)                                                                                                                                     |
+|       root.READ: NodeMutex@1 at ThinBST.search$suspendImpl(ThinBST.kt:121)                                                                                                                       |                                                                                                                                                                               |
+|       search(NodeMutex@1,1): 1 at ThinBST.search$suspendImpl(ThinBST.kt:121)                                                                                                                     |                                                                                                                                                                               |
+|         getValue(): 1 at ThinBST.search(ThinBST.kt:130)                                                                                                                                          |                                                                                                                                                                               |
+|           value.READ: 1 at NodeMutex.getValue(NodeMutex.kt:3)                                                                                                                                    |                                                                                                                                                                               |
+|         unlock() at ThinBST.search(ThinBST.kt:131)                                                                                                                                               |                                                                                                                                                                               |
+|           unlock$default(MutexImpl@1,null,1,null) at NodeMutex.unlock(NodeMutex.kt:9)                                                                                                            |                                                                                                                                                                               |
+|             unlock(null) at Mutex$DefaultImpls.unlock$default(Mutex.kt:98)                                                                                                                       |                                                                                                                                                                               |
+|               isLocked(): true at MutexImpl.unlock(Mutex.kt:213)                                                                                                                                 |                                                                                                                                                                               |
+|                 getAvailablePermits(): 0 at MutexImpl.isLocked(Mutex.kt:149)                                                                                                                     |                                                                                                                                                                               |
+|                   _availablePermits.get(): -1 at SemaphoreImpl.getAvailablePermits(Semaphore.kt:152)                                                                                             |                                                                                                                                                                               |
+|               owner.get(): null at MutexImpl.unlock(Mutex.kt:215)                                                                                                                                |                                                                                                                                                                               |
+|               owner.compareAndSet(null,&lt;NO_OWNER&gt;): true at MutexImpl.unlock(Mutex.kt:220)                                                                                                       |                                                                                                                                                                               |
+|               release() at MutexImpl.unlock(Mutex.kt:222)                                                                                                                                        |                                                                                                                                                                               |
+|                 _availablePermits.getAndIncrement(): -1 at SemaphoreImpl.release(Semaphore.kt:250)                                                                                               |                                                                                                                                                                               |
+|                 tryResumeNextFromQueue(): true at SemaphoreImpl.release(Semaphore.kt:265)                                                                                                        |                                                                                                                                                                               |
+|                   head.get(): SemaphoreSegment@1 at SemaphoreImpl.tryResumeNextFromQueue(Semaphore.kt:319)                                                                                       |                                                                                                                                                                               |
+|                   deqIdx.getAndIncrement(): 0 at SemaphoreImpl.tryResumeNextFromQueue(Semaphore.kt:320)                                                                                          |                                                                                                                                                                               |
+|                   findSegmentInternal(SemaphoreSegment@1,0,createNewSegment$1): SemaphoreSegment@1 at SemaphoreImpl.tryResumeNextFromQueue(Semaphore.kt:446)                                     |                                                                                                                                                                               |
+|                     isRemoved(): false at ConcurrentLinkedListKt.findSegmentInternal(ConcurrentLinkedList.kt:26)                                                                                 |                                                                                                                                                                               |
+|                       cleanedAndPointers.get(): 131072 at Segment.isRemoved(ConcurrentLinkedList.kt:222)                                                                                         |                                                                                                                                                                               |
+|                   head.get(): SemaphoreSegment@1 at SemaphoreImpl.tryResumeNextFromQueue(Semaphore.kt:447)                                                                                       |                                                                                                                                                                               |
+|                   cleanPrev() at SemaphoreImpl.tryResumeNextFromQueue(Semaphore.kt:325)                                                                                                          |                                                                                                                                                                               |
+|                     _prev.lazySet(null) at ConcurrentLinkedListNode.cleanPrev(ConcurrentLinkedList.kt:132)                                                                                       |                                                                                                                                                                               |
+|                   getAndSet(0,&lt;PERMIT&gt;): &lt;cont&gt; at SemaphoreImpl.tryResumeNextFromQueue(Semaphore.kt:456)                                                                                        |                                                                                                                                                                               |
+|                   tryResumeAcquire(&lt;cont&gt;): true at SemaphoreImpl.tryResumeNextFromQueue(Semaphore.kt:340)                                                                                       |                                                                                                                                                                               |
+|                     tryResume(Unit@1,null,onCancellationRelease$1): &lt;RESUME_TOKEN&gt; at SemaphoreImpl.tryResumeAcquire(Semaphore.kt:347)                                                           |                                                                                                                                                                               |
+|                       tryResume(Unit@1,null,onCancellationRelease$1): &lt;RESUME_TOKEN&gt; at MutexImpl$CancellableContinuationWithOwner.tryResume(Mutex.kt:250)                                       |                                                                                                                                                                               |
+|                         owner.get(): &lt;NO_OWNER&gt; at MutexImpl$CancellableContinuationWithOwner.tryResume(Mutex.kt:257)                                                                            |                                                                                                                                                                               |
+|                         tryResume(Unit@1,null,token$1): &lt;RESUME_TOKEN&gt; at MutexImpl$CancellableContinuationWithOwner.tryResume(Mutex.kt:258)                                                     |                                                                                                                                                                               |
+|                           tryResumeImpl(Unit@1,null,token$1): &lt;RESUME_TOKEN&gt; at CancellableContinuationImpl.tryResume(CancellableContinuationImpl.kt:582)                                        |                                                                                                                                                                               |
+|                             _state.get(): SemaphoreSegment@1 at CancellableContinuationImpl.tryResumeImpl(CancellableContinuationImpl.kt:0)                                                      |                                                                                                                                                                               |
+|                             resumeMode.READ: 1 at CancellableContinuationImpl.tryResumeImpl(CancellableContinuationImpl.kt:540)                                                                  |                                                                                                                                                                               |
+|                             _state.compareAndSet(SemaphoreSegment@1,CompletedContinuation@1): true at CancellableContinuationImpl.tryResumeImpl(CancellableContinuationImpl.kt:541)              |                                                                                                                                                                               |
+|                             detachChildIfNonResuable() at CancellableContinuationImpl.tryResumeImpl(CancellableContinuationImpl.kt:542)                                                          |                                                                                                                                                                               |
+|                               isReusable(): false at CancellableContinuationImpl.detachChildIfNonResuable(CancellableContinuationImpl.kt:565)                                                    |                                                                                                                                                                               |
+|                                 resumeMode.READ: 1 at CancellableContinuationImpl.isReusable(CancellableContinuationImpl.kt:141)                                                                 |                                                                                                                                                                               |
+|                               detachChild$kotlinx_coroutines_core() at CancellableContinuationImpl.detachChildIfNonResuable(CancellableContinuationImpl.kt:565)                                  |                                                                                                                                                                               |
+|                                 getParentHandle(): null at CancellableContinuationImpl.detachChild$kotlinx_coroutines_core(CancellableContinuationImpl.kt:572)                                   |                                                                                                                                                                               |
+|                                   _parentHandle.get(): null at CancellableContinuationImpl.getParentHandle(CancellableContinuationImpl.kt:106)                                                   |                                                                                                                                                                               |
+|                         owner.get(): &lt;NO_OWNER&gt; at MutexImpl$CancellableContinuationWithOwner.tryResume(Mutex.kt:264)                                                                            |                                                                                                                                                                               |
+|                         owner.set(null) at MutexImpl$CancellableContinuationWithOwner.tryResume(Mutex.kt:265)                                                                                    |                                                                                                                                                                               |
+|                     completeResume(&lt;RESUME_TOKEN&gt;) at SemaphoreImpl.tryResumeAcquire(Semaphore.kt:349)                                                                                           |                                                                                                                                                                               |
+|                       completeResume(&lt;RESUME_TOKEN&gt;) at MutexImpl$CancellableContinuationWithOwner.completeResume(Mutex.kt:0)                                                                    |                                                                                                                                                                               |
+|                         resumeMode.READ: 1 at CancellableContinuationImpl.completeResume(CancellableContinuationImpl.kt:590)                                                                     |                                                                                                                                                                               |
+|                         dispatchResume(1) at CancellableContinuationImpl.completeResume(CancellableContinuationImpl.kt:590)                                                                      |                                                                                                                                                                               |
+|                           tryResume(): false at CancellableContinuationImpl.dispatchResume(CancellableContinuationImpl.kt:472)                                                                   |                                                                                                                                                                               |
+|                             _decisionAndIndex.get(): 536870912 at CancellableContinuationImpl.tryResume(CancellableContinuationImpl.kt:0)                                                        |                                                                                                                                                                               |
+|                           dispatch(&lt;cont&gt;,1) at CancellableContinuationImpl.dispatchResume(CancellableContinuationImpl.kt:474)                                                                   |                                                                                                                                                                               |
+|                             resume(&lt;cont&gt;,&lt;cont&gt;,false) at DispatchedTaskKt.dispatch(DispatchedTask.kt:168)                                                                                      |                                                                                                                                                                               |
+|                               takeState$kotlinx_coroutines_core(): CompletedContinuation@1 at DispatchedTaskKt.resume(DispatchedTask.kt:174)                                                     |                                                                                                                                                                               |
+|                                 getState$kotlinx_coroutines_core(): CompletedContinuation@1 at CancellableContinuationImpl.takeState$kotlinx_coroutines_core(CancellableContinuationImpl.kt:168) |                                                                                                                                                                               |
+|                                   _state.get(): CompletedContinuation@1 at CancellableContinuationImpl.getState$kotlinx_coroutines_core(CancellableContinuationImpl.kt:108)                      |                                                                                                                                                                               |
+|         getValue(): 1 at ThinBST.search(ThinBST.kt:132)                                                                                                                                          |                                                                                                                                                                               |
+|           value.READ: 1 at NodeMutex.getValue(NodeMutex.kt:3)                                                                                                                                    |                                                                                                                                                                               |
+|   result: 1                                                                                                                                                                                      |                                                                                                                                                                               |
+|                                                                                                                                                                                                  |   root.READ: NodeMutex@1 at ThinBST.search$suspendImpl(ThinBST.kt:121)                                                                                                        |
+|                                                                                                                                                                                                  |   result: SUSPENDED + 1                                                                                                                                                       |
+|                                                                                                                                                                                                  |             value.READ: 1 at NodeMutex.getValue(NodeMutex.kt:3)                                                                                                               |
+|                                                                                                                                                                                                  |                 unlock$default(MutexImpl@1,null,1,null) at NodeMutex.unlock(NodeMutex.kt:9)                                                                                   |
+|                                                                                                                                                                                                  |                   unlock(null) at Mutex$DefaultImpls.unlock$default(Mutex.kt:98)                                                                                              |
+|                                                                                                                                                                                                  |                     isLocked(): true at MutexImpl.unlock(Mutex.kt:213)                                                                                                        |
+|                                                                                                                                                                                                  |                       getAvailablePermits(): 0 at MutexImpl.isLocked(Mutex.kt:149)                                                                                            |
+|                                                                                                                                                                                                  |                         _availablePermits.get(): 0 at SemaphoreImpl.getAvailablePermits(Semaphore.kt:152)                                                                     |
+|                                                                                                                                                                                                  |                     owner.get(): null at MutexImpl.unlock(Mutex.kt:215)                                                                                                       |
+|                                                                                                                                                                                                  |                     owner.compareAndSet(null,&lt;NO_OWNER&gt;): true at MutexImpl.unlock(Mutex.kt:220)                                                                              |
+|                                                                                                                                                                                                  |                     release() at MutexImpl.unlock(Mutex.kt:222)                                                                                                               |
+|                                                                                                                                                                                                  |                       _availablePermits.getAndIncrement(): 0 at SemaphoreImpl.release(Semaphore.kt:250)                                                                       |
+|                                                                                                                                                                                                  |       getValue(): 1 at ThinBST.search(ThinBST.kt:132)                                                                                                                         |
+|                                                                                                                                                                                                  |         value.READ: 1 at NodeMutex.getValue(NodeMutex.kt:3)                                                                                                                   |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+
+	at app//org.jetbrains.kotlinx.lincheck.LinChecker.check(LinChecker.kt:43)
+	at app//org.jetbrains.kotlinx.lincheck.LinChecker$Companion.check(LinChecker.kt:149)
+	at app//org.jetbrains.kotlinx.lincheck.LinCheckerKt.check(LinChecker.kt:164)
+	at app//org.jetbrains.kotlinx.lincheck.LinCheckerKt.check(LinChecker.kt:173)
+	at app//TestsTreiberStack.modelCheckingTest(TestsThinBST.kt:35)
+	at java.base@17.0.7/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base@17.0.7/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base@17.0.7/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base@17.0.7/java.lang.reflect.Method.invoke(Method.java:568)
+	at app//org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:686)
+	at app//org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+	at app//org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at app//org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:149)
+	at app//org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:140)
+	at app//org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:84)
+	at app//org.junit.jupiter.engine.execution.ExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(ExecutableInvoker.java:115)
+	at app//org.junit.jupiter.engine.execution.ExecutableInvoker.lambda$invoke$0(ExecutableInvoker.java:105)
+	at app//org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at app//org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at app//org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at app//org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at app//org.junit.jupiter.engine.execution.ExecutableInvoker.invoke(ExecutableInvoker.java:104)
+	at app//org.junit.jupiter.engine.execution.ExecutableInvoker.invoke(ExecutableInvoker.java:98)
+	at app//org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$6(TestMethodTestDescriptor.java:212)
+	at app//org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at app//org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:208)
+	at app//org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:137)
+	at app//org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:71)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:135)
+	at app//org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$7(NodeTestTask.java:125)
+	at app//org.junit.platform.engine.support.hierarchical.Node.around(Node.java:135)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:123)
+	at app//org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:122)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:80)
+	at java.base@17.0.7/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at app//org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:38)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:139)
+	at app//org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$7(NodeTestTask.java:125)
+	at app//org.junit.platform.engine.support.hierarchical.Node.around(Node.java:135)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:123)
+	at app//org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:122)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:80)
+	at java.base@17.0.7/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at app//org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:38)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:139)
+	at app//org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$7(NodeTestTask.java:125)
+	at app//org.junit.platform.engine.support.hierarchical.Node.around(Node.java:135)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:123)
+	at app//org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:122)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:80)
+	at app//org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:32)
+	at app//org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at app//org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:51)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:96)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:75)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:99)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:79)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:75)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:61)
+	at java.base@17.0.7/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base@17.0.7/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base@17.0.7/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base@17.0.7/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:94)
+	at jdk.proxy1/jdk.proxy1.$Proxy2.stop(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:193)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:129)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:100)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:60)
+	at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:133)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:71)
+	at app//worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
+	at app//worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
+</pre>
+</span>
+</div>
+<div class="test">
+<a name="stressTest()"></a>
+<h3 class="failures">stressTest()</h3>
+<span class="code">
+<pre>org.jetbrains.kotlinx.lincheck.LincheckAssertionError: 
+= Invalid execution results =
+| ----------------------------------------------------------- |
+|       Thread 1        |              Thread 2               |
+| ----------------------------------------------------------- |
+| pop(1) + cancel: void | push(-1) + cancel: SUSPENDED + void |
+| top(1): 1 [1,0]       |                                     |
+| ----------------------------------------------------------- |
+
+---
+Values in &quot;[..]&quot; brackets indicate the number of completed operations
+in each of the parallel threads seen at the beginning of the current operation
+---
+
+	at app//org.jetbrains.kotlinx.lincheck.LinChecker.check(LinChecker.kt:43)
+	at app//org.jetbrains.kotlinx.lincheck.LinChecker$Companion.check(LinChecker.kt:149)
+	at app//org.jetbrains.kotlinx.lincheck.LinCheckerKt.check(LinChecker.kt:164)
+	at app//org.jetbrains.kotlinx.lincheck.LinCheckerKt.check(LinChecker.kt:173)
+	at app//TestsTreiberStack.stressTest(TestsThinBST.kt:26)
+	at java.base@17.0.7/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base@17.0.7/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base@17.0.7/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base@17.0.7/java.lang.reflect.Method.invoke(Method.java:568)
+	at app//org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:686)
+	at app//org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+	at app//org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at app//org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:149)
+	at app//org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:140)
+	at app//org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:84)
+	at app//org.junit.jupiter.engine.execution.ExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(ExecutableInvoker.java:115)
+	at app//org.junit.jupiter.engine.execution.ExecutableInvoker.lambda$invoke$0(ExecutableInvoker.java:105)
+	at app//org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at app//org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at app//org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at app//org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at app//org.junit.jupiter.engine.execution.ExecutableInvoker.invoke(ExecutableInvoker.java:104)
+	at app//org.junit.jupiter.engine.execution.ExecutableInvoker.invoke(ExecutableInvoker.java:98)
+	at app//org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$6(TestMethodTestDescriptor.java:212)
+	at app//org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at app//org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:208)
+	at app//org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:137)
+	at app//org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:71)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:135)
+	at app//org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$7(NodeTestTask.java:125)
+	at app//org.junit.platform.engine.support.hierarchical.Node.around(Node.java:135)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:123)
+	at app//org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:122)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:80)
+	at java.base@17.0.7/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at app//org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:38)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:139)
+	at app//org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$7(NodeTestTask.java:125)
+	at app//org.junit.platform.engine.support.hierarchical.Node.around(Node.java:135)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:123)
+	at app//org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:122)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:80)
+	at java.base@17.0.7/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at app//org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:38)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:139)
+	at app//org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$7(NodeTestTask.java:125)
+	at app//org.junit.platform.engine.support.hierarchical.Node.around(Node.java:135)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:123)
+	at app//org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:122)
+	at app//org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:80)
+	at app//org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:32)
+	at app//org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at app//org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:51)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:96)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:75)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:99)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:79)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:75)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:61)
+	at java.base@17.0.7/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base@17.0.7/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base@17.0.7/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base@17.0.7/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:94)
+	at jdk.proxy1/jdk.proxy1.$Proxy2.stop(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:193)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:129)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:100)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:60)
+	at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:133)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:71)
+	at app//worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
+	at app//worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
+</pre>
+</span>
+</div>
+</div>
+<div id="tab1" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="failures">modelCheckingTest()</td>
+<td class="failures">2.064s</td>
+<td class="failures">failed</td>
+</tr>
+<tr>
+<td class="failures">stressTest()</td>
+<td class="failures">2.936s</td>
+<td class="failures">failed</td>
+</tr>
+</table>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 7.4.2</a> at 23 мая 2024 г., 03:08:21</p>
+</div>
+</div>
+</body>
+</html>
