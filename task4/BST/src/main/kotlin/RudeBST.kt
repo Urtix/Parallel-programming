@@ -3,34 +3,51 @@ class RudeBST<T : Comparable<T>> : BinarySearchTree<T>() {
 
     private var root: Node<T>? = null
 
-    override fun add(value: T) {
+    // Вставка узла
+    override fun add(key: T, value: T) {
         synchronized(lock) {
-            root = add(root, value)
+            root = add(root, key, value)
         }
     }
 
-    override fun search(value: T): Any? {
+    override fun add(key: T){
+        add(key, key)
+    }
+
+    // Удаление узла
+    override fun delete(key: T) {
         synchronized(lock) {
-            return search(root, value)
+            root = delete(root, key)
         }
     }
 
-    override fun delete(value: T) {
+    // Поиск узла
+    override fun search(key: T): Any? {
         synchronized(lock) {
-            root = delete(root, value)
+            return search(root, key)
         }
     }
 
     override fun printTree() {
-        printTree(root)
+        printTreeValue(root)
+        println()
+        printTreeKey(root)
     }
 
-    private fun printTree(node: Node<T>?) {
+    private fun printTreeValue(node: Node<T>?) {
         if (node == null) {
             return
         }
-        printTree(node.left)
+        printTreeValue(node.left)
         print("${node.value} ")
-        printTree(node.right)
+        printTreeValue(node.right)
+    }
+    private fun printTreeKey(node: Node<T>?) {
+        if (node == null) {
+            return
+        }
+        printTreeKey(node.left)
+        print("${node.key} ")
+        printTreeKey(node.right)
     }
 }

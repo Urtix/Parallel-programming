@@ -2,22 +2,26 @@ open class BinarySearchTree<T : Comparable<T>> {
     private var root: Node<T>? = null
 
     // Вставка узла
-    open fun add(value: T) {
-        root = add(root, value)
+    open fun add(key: T, value: T) {
+        root = add(root, key, value)
     }
 
-    protected fun add(node: Node<T>?, value: T): Node<T> {
+    open fun add(key: T) {
+        add(key, key)
+    }
+
+    protected fun add(node: Node<T>?, key: T, value: T): Node<T> {
         return if (node == null) {
-            Node(value)
+            Node(key, value)
         } else {
             when {
-                value < node.value -> {
-                    node.left = add(node.left, value)
+                key < node.key -> {
+                    node.left = add(node.left, key, value)
                     node
                 }
 
-                value > node.value -> {
-                    node.right = add(node.right, value)
+                key > node.key -> {
+                    node.right = add(node.right, key, value)
                     node
                 }
 
@@ -27,17 +31,17 @@ open class BinarySearchTree<T : Comparable<T>> {
     }
 
     // Удаление узла
-    open fun delete(value: T) {
-        root = delete(root, value)
+    open fun delete(key: T) {
+        root = delete(root, key)
     }
 
-    protected fun delete(node: Node<T>?, value: T): Node<T>? {
+    protected fun delete(node: Node<T>?, key: T): Node<T>? {
         if (node == null) {
             return null
         }
 
         when {
-            value == node.value -> {
+            key == node.key -> {
                 return when {
                     node.left == null -> node.right
                     node.right == null -> node.left
@@ -46,51 +50,62 @@ open class BinarySearchTree<T : Comparable<T>> {
                         while (successor?.left != null) {
                             successor = successor.left
                         }
+                        node.key = successor!!.key
                         node.value = successor!!.value
-                        node.right = delete(node.right, successor.value)
+                        node.right = delete(node.right, successor.key)
                         node
                     }
                 }
             }
-            value < node.value -> {
-                node.left = delete(node.left, value)
+            key < node.key -> {
+                node.left = delete(node.left, key)
                 return node
             }
             else -> {
-                node.right = delete(node.right, value)
+                node.right = delete(node.right, key)
                 return node
             }
         }
     }
 
     // Поиск узла
-    open fun search(value: T): Any? {
-        return search(root, value)
+    open fun search(key: T): Any? {
+        return search(root, key)
     }
 
-    protected fun search(node: Node<T>?, value: T): Any? {
+    protected fun search(node: Node<T>?, key: T): Any? {
         return if (node == null) {
             null
         } else {
             when {
-                value == node.value -> node.value
-                value < node.value -> search(node.left, value)
-                else -> search(node.right, value)
+                key == node.key -> node.value
+                key < node.key -> search(node.left, key)
+                else -> search(node.right, key)
             }
         }
     }
 
     // Печать дерева
     open fun printTree() {
-        printTree(root)
+        printTreeValue(root)
+        println()
+        printTreeKey(root)
     }
 
-    private fun printTree(node: Node<T>?) {
+    private fun printTreeValue(node: Node<T>?) {
         if (node == null) {
             return
         }
-        printTree(node.left)
+        printTreeValue(node.left)
         print("${node.value} ")
-        printTree(node.right)
+        printTreeValue(node.right)
+    }
+    private fun printTreeKey(node: Node<T>?) {
+        if (node == null) {
+            return
+        }
+        printTreeKey(node.left)
+        print("${node.value} ")
+        printTreeKey(node.right)
     }
 }

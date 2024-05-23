@@ -5,9 +5,7 @@ import org.junit.jupiter.api.Test
 
 
 class TestsThinBST{
-    private val nodes: Int = 500
-    private fun sleepTime() = Random.nextLong(100)
-
+    private val nodes: Int = 1000
     private val tree = ThinBST<Int>()
     private var listRandomNodes = (0..nodes).shuffled().take(nodes)
 
@@ -32,25 +30,37 @@ class TestsThinBST{
         val headNodes = listRandomNodes.subList(0, listRandomNodes.size / 2)
         val tailNodes = listRandomNodes.subList(listRandomNodes.size / 2, listRandomNodes.size)
         coroutineScope {
-            repeat(nodes/2) {
-                launch {
-                    delay(sleepTime())
+
+            launch {
+                delay(50)
+                repeat(nodes/2) {
                     tree.add(headNodes[it])
                 }
-                launch {
-                    delay(sleepTime())
+            }
+            launch {
+                delay(50)
+                repeat(nodes/2) {
                     tree.add(tailNodes[it])
                 }
             }
+
         }
 
         val nodesToDelete = listRandomNodes.shuffled(Random).take(nodes / 2)
+        val headNodesToDelete = nodesToDelete.subList(0, nodesToDelete.size / 2)
+        val tailNodesToDelete = nodesToDelete.subList(nodesToDelete.size / 2, nodesToDelete.size)
 
         coroutineScope {
-            repeat(nodes / 2) {
-                launch {
-                    delay(sleepTime())
-                    tree.delete(nodesToDelete[it])
+            launch {
+                delay(50)
+                repeat(nodes / 4) {
+                    tree.delete(headNodesToDelete[it])
+                }
+            }
+            launch {
+                delay(50)
+                repeat(nodes / 4) {
+                    tree.delete(tailNodesToDelete[it])
                 }
             }
         }

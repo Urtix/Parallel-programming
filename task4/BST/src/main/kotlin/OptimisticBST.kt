@@ -3,17 +3,21 @@ open class OptimisticBST<T : Comparable<T>> : ThinBST<T>()  {
     private var root: NodeMutex<T>? = null
 
     // Вставка узла
-    override suspend fun add(value: T) {
+    override suspend fun add(key: T, value: T) {
         root = if (root?.value != null) {
-            add(root, value, null)
+            add(root, key, value, null)
         } else {
-            NodeMutex(value, null)
+            NodeMutex(key, value, null)
         }
     }
 
-    private suspend fun add(node: NodeMutex<T>?, value: T, parent: NodeMutex<T>?): NodeMutex<T> {
+    override suspend fun add(key: T) {
+        add(key, key)
+    }
+
+    private suspend fun add(node: NodeMutex<T>?, key: T, value: T, parent: NodeMutex<T>?): NodeMutex<T> {
         return if (node == null) {
-            NodeMutex(value, parent)
+            NodeMutex(key, value, parent)
         } else {
             when {
                 value < node.value -> {
@@ -22,15 +26,15 @@ open class OptimisticBST<T : Comparable<T>> : ThinBST<T>()  {
                         node.parent?.lock()
                         val newNode = doubleSearch(root, node.value)
                         if ((newNode == node) && (newNode.parent == node.parent)) {
-                            node.left = NodeMutex(value, parent)
+                            node.left = NodeMutex(key, value, parent)
                             node.unlock()
                             node.parent?.unlock()
                             
                         } else {
-                            add(root, value, null)
+                            add(root, key, value, null)
                         }
                     } else {
-                        node.left = add(node.left, value, null)
+                        node.left = add(node.left, key, value, null)
                     }
                     node
                 }
@@ -41,15 +45,15 @@ open class OptimisticBST<T : Comparable<T>> : ThinBST<T>()  {
                         node.parent?.lock()
                         val newNode = doubleSearch(root, node.value)
                         if ((newNode == node) && (newNode.parent == node.parent)) {
-                            node.right = NodeMutex(value, parent)
+                            node.right = NodeMutex(value, key, parent)
                             node.unlock()
                             node.parent?.unlock()
 
                         } else {
-                            root = add(root, value, null)
+                            root = add(root, key, value, null)
                         }
                     } else {
-                        node.right = add(node.right, value, node)
+                        node.right = add(node.right, key, value, node)
                     }
                     node
                 }
@@ -60,20 +64,20 @@ open class OptimisticBST<T : Comparable<T>> : ThinBST<T>()  {
     }
 
     // Удаление узла
-    override suspend fun delete(value: T) {
-        root = optimisticDelete(root, value)
+    override suspend fun delete(key: T) {
+        root = optimisticDelete(root, key)
     }
 
-    private suspend fun optimisticDelete(node: NodeMutex<T>?, value: T): NodeMutex<T>? {
+    private suspend fun optimisticDelete(node: NodeMutex<T>?, key: T): NodeMutex<T>? {
         if (node == null) {
             return null
         }
 
         when {
-            value == node.value -> {
+            key == node.key -> {
                 node.parent?.lock()
                 node.lock()
-                val newNode = doubleSearch(root, node.value)
+                val newNode = doubleSearch(root, node.key)
                 if ((newNode == node) && (newNode.parent == node.parent)) {
                     return when {
                         node.left == null -> {
@@ -92,7 +96,8 @@ open class OptimisticBST<T : Comparable<T>> : ThinBST<T>()  {
                                 successor = successor.left
                             }
                             node.right?.lock()
-                            node.right = thinDelete(node.right, successor!!.value)
+                            node.right = thinDelete(node.right, successor!!.key)
+                            node.key = successor.key
                             node.value = successor.value
                             node.parent?.unlock()
                             node.unlock()
@@ -102,56 +107,56 @@ open class OptimisticBST<T : Comparable<T>> : ThinBST<T>()  {
                 } else {
                     node.parent?.unlock()
                     node.unlock()
-                    return optimisticDelete(root, value)
+                    return optimisticDelete(root, key)
                 }
             }
-            value < node.value -> {
-                node.left = optimisticDelete(node.left, value)
+            key < node.key -> {
+                node.left = optimisticDelete(node.left, key)
                 return node
             }
             else -> {
-                node.right = optimisticDelete(node.right, value)
+                node.right = optimisticDelete(node.right, key)
                 return node
             }
         }
     }
 
     // Поиск узла
-    override suspend fun search(value: T): Any? {
-        return search(root, value)
+    override suspend fun search(key: T): Any? {
+        return search(root, key)
     }
 
-    private suspend fun search(node: NodeMutex<T>?, value: T): Any? {
+    private suspend fun search(node: NodeMutex<T>?, key: T): Any? {
         return if (node == null) {
             null
         } else {
             when {
-                value == node.value -> {
+                key == node.key -> {
                     node.parent?.lock()
                     node.lock()
-                    val newNode = doubleSearch(root, value)
+                    val newNode = doubleSearch(root, key)
                     if ((newNode == node) && (newNode.parent == node.parent)) {
                         node.unlock()
                         node.parent?.unlock()
                         return node.value
                     } else {
-                        search(root, value)
+                        search(root, key)
                     }
                 }
-                value < node.value -> search(node.left, value)
-                else -> search(node.right, value)
+                key < node.value -> search(node.left, key)
+                else -> search(node.right, key)
             }
         }
     }
 
-    private fun doubleSearch(node: NodeMutex<T>?, value: T): NodeMutex<T>? {
+    private fun doubleSearch(node: NodeMutex<T>?, key: T): NodeMutex<T>? {
         return if (node == null) {
             null
         } else {
             when {
-                value == node.value -> node
-                value < node.value -> doubleSearch(node.left, value)
-                else -> doubleSearch(node.right, value)
+                key == node.key -> node
+                key < node.key -> doubleSearch(node.left, key)
+                else -> doubleSearch(node.right, key)
             }
         }
     }

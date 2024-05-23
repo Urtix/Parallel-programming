@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="TestsRudeBST" tests="2" skipped="0" failures="0" errors="0" timestamp="2024-05-23T14:34:46" hostname="LAPTOP-4GT1SVLV" time="0.275">
-  <properties/>
-  <testcase name="one thread test()" classname="TestsRudeBST" time="0.02"/>
-  <testcase name="parallel test()" classname="TestsRudeBST" time="0.249"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

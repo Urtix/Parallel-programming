@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="TestsThinBST" tests="2" skipped="0" failures="0" errors="0" timestamp="2024-05-23T14:34:46" hostname="LAPTOP-4GT1SVLV" time="0.233">
+<testsuite name="TestsThinBST" tests="2" skipped="0" failures="0" errors="0" timestamp="2024-05-23T20:32:47" hostname="LAPTOP-4GT1SVLV" time="0.23">
   <properties/>
-  <testcase name="one thread test()" classname="TestsThinBST" time="0.011"/>
-  <testcase name="parallel test()" classname="TestsThinBST" time="0.221"/>
+  <testcase name="one thread test()" classname="TestsThinBST" time="0.07"/>
+  <testcase name="parallel test()" classname="TestsThinBST" time="0.158"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

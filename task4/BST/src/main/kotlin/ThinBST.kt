@@ -4,30 +4,34 @@ open class ThinBST<T : Comparable<T>> {
     private var root: NodeMutex<T>? = null
 
     // Вставка узла
-    open suspend fun add(value: T) {
+    open suspend fun add(key: T, value: T) {
         Mutex().lock()
         root = if (root != null) {
             root?.lock()
-            add(root, value, null)
+            add(root, key, value, null)
         } else {
-            NodeMutex(value, null)
+            NodeMutex(key, value, null)
         }
     }
 
-    private suspend fun add(node: NodeMutex<T>?, value: T, parent: NodeMutex<T>?): NodeMutex<T> {
+    open suspend fun add(key: T){
+        add(key, key)
+    }
+
+    private suspend fun add(node: NodeMutex<T>?, key: T, value: T, parent: NodeMutex<T>?): NodeMutex<T> {
         return if (node == null) {
-            NodeMutex(value, parent)
+            NodeMutex(key, value, parent)
         } else {
             when {
                 value < node.value -> {
                     if (node.left != null) {
                         node.left?.lock()
                         node.unlock()
-                        node.left = add(node.left, value, node)
+                        node.left = add(node.left, key, value, node)
                     } else {
                         node.unlock()
                         node.left?.lock()
-                        node.left = NodeMutex(value, parent)
+                        node.left = NodeMutex(key, value, parent)
                     }
                     node
                 }
@@ -35,11 +39,11 @@ open class ThinBST<T : Comparable<T>> {
                     if (node.right != null) {
                         node.right?.lock()
                         node.unlock()
-                        node.right = add(node.right, value, node)
+                        node.right = add(node.right, key, value, node)
                     } else {
                         node.unlock()
                         node.right?.lock()
-                        node.right = NodeMutex(value, parent)
+                        node.right = NodeMutex(key, value, parent)
                     }
                     node
                 }
@@ -52,20 +56,20 @@ open class ThinBST<T : Comparable<T>> {
     }
 
     // Удаление узла
-    open suspend fun delete(value: T) {
+    open suspend fun delete(key: T) {
         Mutex().lock()
         if (root != null) {
             root?.lock()
-            root = thinDelete(root, value)
+            root = thinDelete(root, key)
         }
     }
 
-     protected suspend fun thinDelete(node: NodeMutex<T>?, value: T): NodeMutex<T>? {
+     protected suspend fun thinDelete(node: NodeMutex<T>?, key: T): NodeMutex<T>? {
         if (node == null) {
             return null
         }
         when {
-            value == node.value -> {
+            key == node.key -> {
                 when {
                     node.left == null -> {
                         node.unlock()
@@ -81,21 +85,22 @@ open class ThinBST<T : Comparable<T>> {
                         while (successor?.left != null) {
                             successor = successor.left
                         }
-                        node.value = successor!!.value
+                        node.key = successor!!.key
+                        node.value = successor.value
                         node.unlock()
-                        node.right = thinDelete(node.right, successor.value)
+                        node.right = thinDelete(node.right, successor.key)
                         return node
                     }
                 }
             }
-            value < node.value -> {
+            key < node.key -> {
                 return if (node.left == null ){
                     node.unlock()
                     null
                 } else {
                     node.left?.lock()
                     node.unlock()
-                    node.left = thinDelete(node.left, value)
+                    node.left = thinDelete(node.left, key)
                     node
                 }
             }
@@ -106,7 +111,7 @@ open class ThinBST<T : Comparable<T>> {
                 } else {
                     node.right?.lock()
                     node.unlock()
-                    node.right = thinDelete(node.right, value)
+                    node.right = thinDelete(node.right, key)
                     node
                 }
             }
@@ -114,28 +119,28 @@ open class ThinBST<T : Comparable<T>> {
     }
 
     // Поиск узла
-    open suspend fun search(value: T): Any? {
+    open suspend fun search(key: T): Any? {
         return if (root == null) null
         else {
             root?.lock()
-            search(root, value)
+            search(root, key)
         }
     }
 
-    private suspend fun search(node: NodeMutex<T>?, value: T): Any? {
+    private suspend fun search(node: NodeMutex<T>?, key: T): Any? {
         if (node == null) {
             return null
         } else {
             when {
-                value == node.value -> {
+                key == node.key -> {
                     node.unlock()
                     return node.value
                 }
-                value < node.value -> {
+                key < node.key -> {
                     return if (node.left != null) {
                         node.unlock()
                         node.left?.lock()
-                        search(node.left, value)
+                        search(node.left, key)
                     } else {
                         node.unlock()
                         null
@@ -145,7 +150,7 @@ open class ThinBST<T : Comparable<T>> {
                     return if (node.right != null) {
                         node.unlock()
                         node.right?.lock()
-                        search(node.right, value)
+                        search(node.right, key)
                     } else {
                         node.unlock()
                         null
@@ -157,15 +162,27 @@ open class ThinBST<T : Comparable<T>> {
 
     // Печать дерева
     open fun printTree() {
-        printTree(root)
+        print("Value: ")
+        printTreeValue(root)
+        println()
+        print("Key:   ")
+        printTreeKey(root)
     }
 
-    private fun printTree(node: NodeMutex<T>?) {
+    private fun printTreeValue(node: NodeMutex<T>?) {
         if (node == null) {
             return
         }
-        printTree(node.left)
+        printTreeValue(node.left)
         print("${node.value} ")
-        printTree(node.right)
+        printTreeValue(node.right)
+    }
+    private fun printTreeKey(node: NodeMutex<T>?) {
+        if (node == null) {
+            return
+        }
+        printTreeKey(node.left)
+        print("${node.key} ")
+        printTreeKey(node.right)
     }
 }
