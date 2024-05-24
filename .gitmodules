@@ -1,3 +1,3 @@
-[submodule "ParallelTree"]
+[submodule "task4"]
 	path = ParallelTree
 	url = https://github.com/Urtix/ParallelTree.git
